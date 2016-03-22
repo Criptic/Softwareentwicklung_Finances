@@ -12,3 +12,8 @@ Stylesheet für Customizing
 .top-buffer{
   margin-top: 80px;
 }
+
+/*Custom Navbar Corners */
+.navbar-default{
+  border-radius: 0px;
+}
