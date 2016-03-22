@@ -1,0 +1,14 @@
+/**
+Stylesheet für Customizing
+**/
+
+
+/** Style für Image Höhe **/
+.img-responsive{
+  max-height: 100px;
+}
+
+/**Style für Zwischenraumz wischen reihen **/
+.top-buffer{
+  margin-top: 80px;
+}
