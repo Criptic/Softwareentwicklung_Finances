@@ -86,13 +86,6 @@ public class InvestifyMain {
 			log.info("" + event.get("volume"));
 			log.info("" + event.get("date"));
 			log.info("" + event.get("avg"));
-			
-			try {
-				Thread.sleep(100000);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 		});
 
 		epStatement.start();
@@ -120,23 +113,25 @@ public class InvestifyMain {
 		} else {
 			pastYear = currentYear;
 		}
+		URL baseURLGoogle = null;
+		URL baseURLApple = null;
+		URL baseURLAmazon = null;
+		URL baseURLFacebook = null;
+		URL baseURLMicrosoft = null;
+		URL baseURLTwitter = null;
 		
-		System.out.println("day: " +currentDay +" month: " +currentMonth +" year: " +currentYear);
-		System.out.println("day: " +pastDay +" month: " +pastMonth +" year: " +pastYear);
-		
+		String dateString = String.format("%d&e=%d&f=%d&g=d&a=%d&b=%d&c=%d&ignore=.csv", currentMonth, currentDay, currentYear, pastMonth, pastDay, pastYear );
 		try {
-			URL baseURLGoogle = new URL("http://real-chart.finance.yahoo.com/table.csv?s=GOOG&d=");
-			URL baseURLApple = new URL("http://real-chart.finance.yahoo.com/table.csv?s=APPL&d=");
-			URL baseURLAmazon = new URL("http://real-chart.finance.yahoo.com/table.csv?s=AMZN&d=");
-			URL baseURLFacebook = new URL("http://real-chart.finance.yahoo.com/table.csv?s=FB&d=");
-			URL baseURLMicrosoft = new URL("http://real-chart.finance.yahoo.com/table.csv?s=MSFT&d=");
-			URL baseURLTwitter = new URL("http://real-chart.finance.yahoo.com/table.csv?s=TWTR&d=");
+			baseURLGoogle = new URL("http://real-chart.finance.yahoo.com/table.csv?s=GOOG&d=%d" +dateString);
+			baseURLApple = new URL("http://real-chart.finance.yahoo.com/table.csv?s=APPL&d=" +dateString);
+			baseURLAmazon = new URL("http://real-chart.finance.yahoo.com/table.csv?s=AMZN&d=" +dateString);
+			baseURLFacebook = new URL("http://real-chart.finance.yahoo.com/table.csv?s=FB&d=" +dateString);
+			baseURLMicrosoft = new URL("http://real-chart.finance.yahoo.com/table.csv?s=MSFT&d=" +dateString);
+			baseURLTwitter = new URL("http://real-chart.finance.yahoo.com/table.csv?s=TWTR&d=" +dateString);
 			} catch (MalformedURLException e) {
 			   log.info("MalformedURLException");
 			}
-		
-		
-		//http://real-chart.finance.yahoo.com/table.csv?s=GOOG&d=3&e=4&f=2016&g=d&a=7&b=19&c=2004&ignore=.csv
+
 		// Setup Esper and define a message Type "StockEvent"
 		EPServiceProvider epServiceProvider = EPServiceProviderManager.getDefaultProvider(esperClientConfiguration);
 		{
