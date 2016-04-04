@@ -1,0 +1,3 @@
+function showApple(){
+  alert('clicked');
+}
