@@ -28,3 +28,7 @@ Stylesheet für Customizing
 .container .text{
   margin: 20px 0;
 }
+
+.jumbotron {
+ padding: 15px;
+}
