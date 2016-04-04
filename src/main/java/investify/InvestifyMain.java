@@ -4,7 +4,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,7 +33,7 @@ public class InvestifyMain {
 	static {
 		setupLogging();
 	}
-	
+		
 	public static void setupLogging() {
 		// Optionally remove existing handlers attached to j.u.l root logger
 		SLF4JBridgeHandler.removeHandlersForRootLogger(); // (since SLF4J 1.6.5)
@@ -82,6 +86,13 @@ public class InvestifyMain {
 			log.info("" + event.get("volume"));
 			log.info("" + event.get("date"));
 			log.info("" + event.get("avg"));
+			
+			try {
+				Thread.sleep(100000);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		});
 
 		epStatement.start();
@@ -90,7 +101,42 @@ public class InvestifyMain {
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		Logger log = LoggerFactory.getLogger(InvestifyMain.class);
 		Configuration esperClientConfiguration = new Configuration();
-
+		
+		//Get Dates for URL-driven download of .CSV
+		int currentDay = new GregorianCalendar().get(Calendar.DAY_OF_MONTH);
+		int currentMonth = new GregorianCalendar().get(Calendar.MONTH);
+		int currentYear = new GregorianCalendar().get(Calendar.YEAR);
+		
+		//Add one to month because GregorianCalendar sees January as 0 - Yahoo Finance sees January as 1
+		currentMonth++;
+		
+		//Logic for past 210 days
+		int pastDay = currentDay;
+		int pastMonth = currentMonth - 7;
+		int pastYear;
+		if(pastMonth <= 0) {
+			pastMonth = 12 + pastMonth;
+			pastYear = currentYear - 1;
+		} else {
+			pastYear = currentYear;
+		}
+		
+		System.out.println("day: " +currentDay +" month: " +currentMonth +" year: " +currentYear);
+		System.out.println("day: " +pastDay +" month: " +pastMonth +" year: " +pastYear);
+		
+		try {
+			URL baseURLGoogle = new URL("http://real-chart.finance.yahoo.com/table.csv?s=GOOG&d=");
+			URL baseURLApple = new URL("http://real-chart.finance.yahoo.com/table.csv?s=APPL&d=");
+			URL baseURLAmazon = new URL("http://real-chart.finance.yahoo.com/table.csv?s=AMZN&d=");
+			URL baseURLFacebook = new URL("http://real-chart.finance.yahoo.com/table.csv?s=FB&d=");
+			URL baseURLMicrosoft = new URL("http://real-chart.finance.yahoo.com/table.csv?s=MSFT&d=");
+			URL baseURLTwitter = new URL("http://real-chart.finance.yahoo.com/table.csv?s=TWTR&d=");
+			} catch (MalformedURLException e) {
+			   log.info("MalformedURLException");
+			}
+		
+		
+		//http://real-chart.finance.yahoo.com/table.csv?s=GOOG&d=3&e=4&f=2016&g=d&a=7&b=19&c=2004&ignore=.csv
 		// Setup Esper and define a message Type "StockEvent"
 		EPServiceProvider epServiceProvider = EPServiceProviderManager.getDefaultProvider(esperClientConfiguration);
 		{
