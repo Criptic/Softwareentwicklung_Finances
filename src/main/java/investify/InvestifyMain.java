@@ -5,11 +5,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -37,17 +34,14 @@ import de.uniluebeck.itm.util.logging.Logging;
 
 public class InvestifyMain {
 
+	private static FileWriter writer;
+
 	static {
 		setupLogging();
 	}
 
 	public static void setupLogging() {
-		// Optionally remove existing handlers attached to j.u.l root logger
-		SLF4JBridgeHandler.removeHandlersForRootLogger(); // (since SLF4J 1.6.5)
-
-		// add SLF4JBridgeHandler to j.u.l's root logger, should be done once
-		// during
-		// the initialization phase of your application
+		SLF4JBridgeHandler.removeHandlersForRootLogger();
 		SLF4JBridgeHandler.install();
 
 		Logging.setLoggingDefaults();
@@ -67,6 +61,7 @@ public class InvestifyMain {
 				event.put("key", key);
 				event.put("closing", Double.parseDouble(record.get("Close")));
 				event.put("date", format.parse(record.get("Date")));
+				;
 
 				esper.sendEvent(event, "StockEvent");
 			}
@@ -76,15 +71,15 @@ public class InvestifyMain {
 		}
 	}
 
-	public static void setupQuery(EPAdministrator esper, Logger log) {
+	public static void setupQuery(EPAdministrator esper, Logger log, String stockSymbol) {
 		String expression = "select date, AVG(closing) as avg " + "from StockEvent.win:time(10 seconds)";
 
 		EPStatement epStatement = esper.createEPL(expression);
 
 		try {
-			final FileWriter writer = new FileWriter("test.csv");
+			writer = new FileWriter(String.format("./src/main/resources/%sIncludingAvg.csv", stockSymbol));
 
-			writer.append("GOOGL");
+			writer.append(stockSymbol);
 			writer.append(',');
 			writer.append("date");
 			writer.append(',');
@@ -101,6 +96,8 @@ public class InvestifyMain {
 
 				try {
 					writer.append(String.valueOf(event.get("date")));
+					writer.append(',');
+					writer.append(String.valueOf(event.get("avg")));
 					writer.append('\n');
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -134,8 +131,6 @@ public class InvestifyMain {
 
 		EPRuntime esper = epServiceProvider.getEPRuntime();
 
-		setupQuery(epServiceProvider.getEPAdministrator(), log);
-
 		// Get Dates for URL-driven download of .csv
 		int currentDay = new GregorianCalendar().get(Calendar.DAY_OF_MONTH);
 		int currentMonth = new GregorianCalendar().get(Calendar.MONTH);
@@ -159,6 +154,8 @@ public class InvestifyMain {
 			String currentStockSymbol = stockSymbols[i];
 			URL baseURL = new URL(String.format("http://real-chart.finance.yahoo.com/table.csv?s=%s%s",
 					currentStockSymbol, dateString));
+
+			setupQuery(epServiceProvider.getEPAdministrator(), log, currentStockSymbol);
 
 			// Writing the .csv file
 			InputStream in = baseURL.openStream();
