@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -38,12 +39,13 @@ public class InvestifyMain {
 	static {
 		setupLogging();
 	}
-		
+
 	public static void setupLogging() {
 		// Optionally remove existing handlers attached to j.u.l root logger
 		SLF4JBridgeHandler.removeHandlersForRootLogger(); // (since SLF4J 1.6.5)
 
-		// add SLF4JBridgeHandler to j.u.l's root logger, should be done once during
+		// add SLF4JBridgeHandler to j.u.l's root logger, should be done once
+		// during
 		// the initialization phase of your application
 		SLF4JBridgeHandler.install();
 
@@ -57,8 +59,7 @@ public class InvestifyMain {
 		Iterable<CSVRecord> records;
 		try {
 			records = CSVFormat.DEFAULT.withHeader("Date", "Open", "High", "Low", "Close", "Volume", "Adj Close")
-					.withSkipHeaderRecord()
-					.parse(new InputStreamReader(instream));
+					.withSkipHeaderRecord().parse(new InputStreamReader(instream));
 
 			for (CSVRecord record : records) {
 				Map<String, Object> event = new HashMap<>();
@@ -97,53 +98,35 @@ public class InvestifyMain {
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		Logger log = LoggerFactory.getLogger(InvestifyMain.class);
 		Configuration esperClientConfiguration = new Configuration();
-		
-		//Get Dates for URL-driven download of .csv
+
+		// Get Dates for URL-driven download of .csv
 		int currentDay = new GregorianCalendar().get(Calendar.DAY_OF_MONTH);
 		int currentMonth = new GregorianCalendar().get(Calendar.MONTH);
 		int currentYear = new GregorianCalendar().get(Calendar.YEAR);
-		
-		//Add one to month because GregorianCalendar sees January as 0 - Yahoo Finance sees January as 1
-		currentMonth++;
-		
-		//Logic for past 210 days
+
+		// Logic for past 210 days
 		int pastDay = currentDay;
-		int pastMonth = currentMonth - 7;
-		int pastYear;
-		if(pastMonth <= 0) {
-			pastMonth = 12 + pastMonth;
-			pastYear = currentYear - 1;
-		} else {
-			pastYear = currentYear;
-		}
-		
-		//Creating URLs for the download of .csv files
-		URL baseURLGoogle = null;
-		URL baseURLApple = null;
-		URL baseURLAmazon = null;
-		URL baseURLFacebook = null;
-		URL baseURLMicrosoft = null;
-		URL baseURLTwitter = null;
-		
-		//Add-on for correct download
-		String dateString = String.format("%d&e=%d&f=%d&g=d&a=%d&b=%d&c=%d&ignore=.csv", currentMonth, currentDay, currentYear, pastMonth, pastDay, pastYear );
-		try {
-			baseURLGoogle = new URL("http://real-chart.finance.yahoo.com/table.csv?s=GOOG&d=%d" +dateString);
-			baseURLApple = new URL("http://real-chart.finance.yahoo.com/table.csv?s=APPL&d=" +dateString);
-			baseURLAmazon = new URL("http://real-chart.finance.yahoo.com/table.csv?s=AMZN&d=" +dateString);
-			baseURLFacebook = new URL("http://real-chart.finance.yahoo.com/table.csv?s=FB&d=" +dateString);
-			baseURLMicrosoft = new URL("http://real-chart.finance.yahoo.com/table.csv?s=MSFT&d=" +dateString);
-			baseURLTwitter = new URL("http://real-chart.finance.yahoo.com/table.csv?s=TWTR&d=" +dateString);
+		int pastMonth = currentMonth;
+		int pastYear = currentYear - 1;
+
+		//Stock symbols array - these Stocks will be analyzed
+		String[] stockSymbols = { "GOOG", "AAPL", "AMZN", "FB", "MSFT", "TWTR" };
+
+		// Add-on for correct download
+		String dateString = String.format("&d=%d&e=%d&f=%d&g=d&a=%d&b=%d&c=%d&ignore=.csv", currentMonth, currentDay,
+				currentYear, pastMonth, pastDay, pastYear);
+		//Here the csv files are downloaded into the resource folder naming convetion: stockSymbol.csv
+		for (int i = 0; i < stockSymbols.length; i++) {
+			String currentStockSymbol = stockSymbols[i];
+			URL baseURL = new URL(String.format("http://real-chart.finance.yahoo.com/table.csv?s=%s%s", currentStockSymbol,
+					dateString));
 			
-			InputStream in = baseURLGoogle.openStream();
-			Path path = Paths.get("./src/main/resources/google.csv");
+			//Writing the .csv file
+			InputStream in = baseURL.openStream();
+			Path path = Paths.get(String.format("./src/main/resources/%s.csv", currentStockSymbol));
 			Files.copy(in, path, StandardCopyOption.REPLACE_EXISTING);
 			in.close();
-			} catch (MalformedURLException e) {
-			   log.info("MalformedURLException");
-			} catch (NoSuchFileException e) {
-				log.info("FileException occured");
-			}
+		}
 
 		// Setup Esper and define a message Type "StockEvent"
 		EPServiceProvider epServiceProvider = EPServiceProviderManager.getDefaultProvider(esperClientConfiguration);
