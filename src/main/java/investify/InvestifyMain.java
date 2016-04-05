@@ -1,6 +1,7 @@
 package investify;
 
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -80,53 +81,46 @@ public class InvestifyMain {
 
 		EPStatement epStatement = esper.createEPL(expression);
 
-		epStatement.addListener((EventBean[] newEvents, EventBean[] oldEvents) -> {
-			if (newEvents == null || newEvents.length < 1) {
-				log.warn("Received null event or length < 1: " + newEvents);
-				return;
-			}
+		try {
+			final FileWriter writer = new FileWriter("test.csv");
 
-			EventBean event = newEvents[0];
+			writer.append("GOOGL");
+			writer.append(',');
+			writer.append("date");
+			writer.append(',');
+			writer.append("avg");
+			writer.append('\n');
 
-			log.info("" + event.get("date"));
-			log.info("" + event.get("avg"));
-		});
+			epStatement.addListener((EventBean[] newEvents, EventBean[] oldEvents) -> {
+				if (newEvents == null || newEvents.length < 1) {
+					log.warn("Received null event or length < 1: " + newEvents);
+					return;
+				}
 
+				EventBean event = newEvents[0];
+
+				try {
+					writer.append(String.valueOf(event.get("date")));
+					writer.append('\n');
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				log.info("" + event.get("date"));
+				log.info("" + event.get("avg"));
+			});
+			writer.flush();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		epStatement.start();
 	}
 
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		Logger log = LoggerFactory.getLogger(InvestifyMain.class);
 		Configuration esperClientConfiguration = new Configuration();
-
-		// Get Dates for URL-driven download of .csv
-		int currentDay = new GregorianCalendar().get(Calendar.DAY_OF_MONTH);
-		int currentMonth = new GregorianCalendar().get(Calendar.MONTH);
-		int currentYear = new GregorianCalendar().get(Calendar.YEAR);
-
-		// Logic for past 210 days
-		int pastDay = currentDay;
-		int pastMonth = currentMonth;
-		int pastYear = currentYear - 1;
-
-		//Stock symbols array - these Stocks will be analyzed
-		String[] stockSymbols = { "GOOG", "AAPL", "AMZN", "FB", "MSFT", "TWTR" };
-
-		// Add-on for correct download
-		String dateString = String.format("&d=%d&e=%d&f=%d&g=d&a=%d&b=%d&c=%d&ignore=.csv", currentMonth, currentDay,
-				currentYear, pastMonth, pastDay, pastYear);
-		//Here the csv files are downloaded into the resource folder naming convetion: stockSymbol.csv
-		for (int i = 0; i < stockSymbols.length; i++) {
-			String currentStockSymbol = stockSymbols[i];
-			URL baseURL = new URL(String.format("http://real-chart.finance.yahoo.com/table.csv?s=%s%s", currentStockSymbol,
-					dateString));
-			
-			//Writing the .csv file
-			InputStream in = baseURL.openStream();
-			Path path = Paths.get(String.format("./src/main/resources/%s.csv", currentStockSymbol));
-			Files.copy(in, path, StandardCopyOption.REPLACE_EXISTING);
-			in.close();
-		}
 
 		// Setup Esper and define a message Type "StockEvent"
 		EPServiceProvider epServiceProvider = EPServiceProviderManager.getDefaultProvider(esperClientConfiguration);
@@ -141,7 +135,41 @@ public class InvestifyMain {
 		EPRuntime esper = epServiceProvider.getEPRuntime();
 
 		setupQuery(epServiceProvider.getEPAdministrator(), log);
-		new Thread(() -> streamToEsper(esper, "google-table.csv", "google")).start();
+
+		// Get Dates for URL-driven download of .csv
+		int currentDay = new GregorianCalendar().get(Calendar.DAY_OF_MONTH);
+		int currentMonth = new GregorianCalendar().get(Calendar.MONTH);
+		int currentYear = new GregorianCalendar().get(Calendar.YEAR);
+
+		// Logic for past 210 days
+		int pastDay = currentDay;
+		int pastMonth = currentMonth;
+		int pastYear = currentYear - 1;
+
+		// Add-on for correct download
+		String dateString = String.format("&d=%d&e=%d&f=%d&g=d&a=%d&b=%d&c=%d&ignore=.csv", currentMonth, currentDay,
+				currentYear, pastMonth, pastDay, pastYear);
+
+		// Stock symbols array - these Stocks will be analyzed
+		String[] stockSymbols = { "GOOG", "AAPL", "AMZN", "FB", "MSFT", "TWTR" };
+
+		// Here the csv files are downloaded into the resource folder naming
+		// convetion: stockSymbol.csv
+		for (int i = 0; i < stockSymbols.length; i++) {
+			String currentStockSymbol = stockSymbols[i];
+			URL baseURL = new URL(String.format("http://real-chart.finance.yahoo.com/table.csv?s=%s%s",
+					currentStockSymbol, dateString));
+
+			// Writing the .csv file
+			InputStream in = baseURL.openStream();
+			Path path = Paths.get(String.format("./src/main/resources/%s.csv", currentStockSymbol));
+			Files.copy(in, path, StandardCopyOption.REPLACE_EXISTING);
+			in.close();
+
+			System.out.println(currentStockSymbol);
+			new Thread(() -> streamToEsper(esper, String.format("%s.csv", currentStockSymbol), currentStockSymbol))
+					.start();
+		}
 
 	}
 
