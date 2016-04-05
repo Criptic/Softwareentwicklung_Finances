@@ -6,6 +6,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -60,7 +65,6 @@ public class InvestifyMain {
 				event.put("key", key);
 				event.put("closing", Double.parseDouble(record.get("Close")));
 				event.put("date", format.parse(record.get("Date")));
-				event.put("volume", Double.parseDouble(record.get("Volume")));
 
 				esper.sendEvent(event, "StockEvent");
 			}
@@ -71,7 +75,7 @@ public class InvestifyMain {
 	}
 
 	public static void setupQuery(EPAdministrator esper, Logger log) {
-		String expression = "select volume, date, AVG(closing) as avg " + "from StockEvent.win:time(10 seconds)";
+		String expression = "select date, AVG(closing) as avg " + "from StockEvent.win:time(10 seconds)";
 
 		EPStatement epStatement = esper.createEPL(expression);
 
@@ -83,7 +87,6 @@ public class InvestifyMain {
 
 			EventBean event = newEvents[0];
 
-			log.info("" + event.get("volume"));
 			log.info("" + event.get("date"));
 			log.info("" + event.get("avg"));
 		});
@@ -95,7 +98,7 @@ public class InvestifyMain {
 		Logger log = LoggerFactory.getLogger(InvestifyMain.class);
 		Configuration esperClientConfiguration = new Configuration();
 		
-		//Get Dates for URL-driven download of .CSV
+		//Get Dates for URL-driven download of .csv
 		int currentDay = new GregorianCalendar().get(Calendar.DAY_OF_MONTH);
 		int currentMonth = new GregorianCalendar().get(Calendar.MONTH);
 		int currentYear = new GregorianCalendar().get(Calendar.YEAR);
@@ -113,6 +116,8 @@ public class InvestifyMain {
 		} else {
 			pastYear = currentYear;
 		}
+		
+		//Creating URLs for the download of .csv files
 		URL baseURLGoogle = null;
 		URL baseURLApple = null;
 		URL baseURLAmazon = null;
@@ -120,6 +125,7 @@ public class InvestifyMain {
 		URL baseURLMicrosoft = null;
 		URL baseURLTwitter = null;
 		
+		//Add-on for correct download
 		String dateString = String.format("%d&e=%d&f=%d&g=d&a=%d&b=%d&c=%d&ignore=.csv", currentMonth, currentDay, currentYear, pastMonth, pastDay, pastYear );
 		try {
 			baseURLGoogle = new URL("http://real-chart.finance.yahoo.com/table.csv?s=GOOG&d=%d" +dateString);
@@ -128,8 +134,15 @@ public class InvestifyMain {
 			baseURLFacebook = new URL("http://real-chart.finance.yahoo.com/table.csv?s=FB&d=" +dateString);
 			baseURLMicrosoft = new URL("http://real-chart.finance.yahoo.com/table.csv?s=MSFT&d=" +dateString);
 			baseURLTwitter = new URL("http://real-chart.finance.yahoo.com/table.csv?s=TWTR&d=" +dateString);
+			
+			InputStream in = baseURLGoogle.openStream();
+			Path path = Paths.get("./src/main/resources/google.csv");
+			Files.copy(in, path, StandardCopyOption.REPLACE_EXISTING);
+			in.close();
 			} catch (MalformedURLException e) {
 			   log.info("MalformedURLException");
+			} catch (NoSuchFileException e) {
+				log.info("FileException occured");
 			}
 
 		// Setup Esper and define a message Type "StockEvent"
@@ -139,7 +152,6 @@ public class InvestifyMain {
 			eventDef.put("key", String.class);
 			eventDef.put("closing", Double.class);
 			eventDef.put("date", java.util.Date.class);
-			eventDef.put("volume", Double.class);
 			epServiceProvider.getEPAdministrator().getConfiguration().addEventType("StockEvent", eventDef);
 		}
 
