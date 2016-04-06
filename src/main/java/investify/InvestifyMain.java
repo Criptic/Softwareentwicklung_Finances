@@ -61,7 +61,6 @@ public class InvestifyMain {
 				event.put("key", key);
 				event.put("closing", Double.parseDouble(record.get("Close")));
 				event.put("date", format.parse(record.get("Date")));
-				;
 
 				esper.sendEvent(event, "StockEvent");
 			}
@@ -72,16 +71,22 @@ public class InvestifyMain {
 	}
 
 	public static void setupQuery(EPAdministrator esper, Logger log, String stockSymbol) {
-		String expression = "select date, AVG(closing) as avg " + "from StockEvent.win:time(10 seconds)";
+		String expression = "select date, closing, AVG(closing) as avg " + "from StockEvent.win:time(10 seconds)";
 
 		EPStatement epStatement = esper.createEPL(expression);
 
+		// Creating a .csv file depending on the stock in which the output of
+		// each esper stream gets saved
+		// Format of .csv file: stockSymbol(will become important at a later
+		// point in time), date, closing, avg
 		try {
 			writer = new FileWriter(String.format("./src/main/resources/%sIncludingAvg.csv", stockSymbol));
 
 			writer.append(stockSymbol);
 			writer.append(',');
 			writer.append("date");
+			writer.append(',');
+			writer.append("closing");
 			writer.append(',');
 			writer.append("avg");
 			writer.append('\n');
@@ -94,8 +99,14 @@ public class InvestifyMain {
 
 				EventBean event = newEvents[0];
 
+				// Appending the values to the .csv files - according to the
+				// structure of the header
 				try {
+					writer.append(stockSymbol);
+					writer.append(',');
 					writer.append(String.valueOf(event.get("date")));
+					writer.append(',');
+					writer.append(String.valueOf(event.get("closing")));
 					writer.append(',');
 					writer.append(String.valueOf(event.get("avg")));
 					writer.append('\n');
@@ -104,6 +115,7 @@ public class InvestifyMain {
 					e.printStackTrace();
 				}
 
+				// This is just for debugging purposes - delete later
 				log.info("" + event.get("date"));
 				log.info("" + event.get("avg"));
 			});
@@ -163,7 +175,6 @@ public class InvestifyMain {
 			Files.copy(in, path, StandardCopyOption.REPLACE_EXISTING);
 			in.close();
 
-			System.out.println(currentStockSymbol);
 			new Thread(() -> streamToEsper(esper, String.format("%s.csv", currentStockSymbol), currentStockSymbol))
 					.start();
 		}
