@@ -34,8 +34,6 @@ import de.uniluebeck.itm.util.logging.Logging;
 
 public class InvestifyMain {
 
-	private static FileWriter writer;
-
 	static {
 		setupLogging();
 	}
@@ -70,7 +68,7 @@ public class InvestifyMain {
 		}
 	}
 
-	public static void setupQuery(EPAdministrator esper, Logger log, String stockSymbol) {
+	public static void setupQuery(EPAdministrator esper, Logger log, String stockSymbol, FileWriter writer) {
 		String expression = "select date, closing, AVG(closing) as avg " + "from StockEvent.win:time(10 seconds)";
 
 		EPStatement epStatement = esper.createEPL(expression);
@@ -80,8 +78,6 @@ public class InvestifyMain {
 		// Format of .csv file: stockSymbol(will become important at a later
 		// point in time), date, closing, avg
 		try {
-			writer = new FileWriter(String.format("./src/main/resources/%sIncludingAvg.csv", stockSymbol));
-
 			writer.append(stockSymbol);
 			writer.append(',');
 			writer.append("date");
@@ -167,14 +163,16 @@ public class InvestifyMain {
 			URL baseURL = new URL(String.format("http://real-chart.finance.yahoo.com/table.csv?s=%s%s",
 					currentStockSymbol, dateString));
 
-			setupQuery(epServiceProvider.getEPAdministrator(), log, currentStockSymbol);
+			FileWriter writer = new FileWriter(String.format("./src/main/resources/%sIncludingAvg.csv", currentStockSymbol));
+			setupQuery(epServiceProvider.getEPAdministrator(), log, currentStockSymbol, writer);
 
 			// Writing the .csv file
 			InputStream in = baseURL.openStream();
 			Path path = Paths.get(String.format("./src/main/resources/%s.csv", currentStockSymbol));
 			Files.copy(in, path, StandardCopyOption.REPLACE_EXISTING);
 			in.close();
-
+			
+			
 			new Thread(() -> streamToEsper(esper, String.format("%s.csv", currentStockSymbol), currentStockSymbol))
 					.start();
 		}
