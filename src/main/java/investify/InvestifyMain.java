@@ -5,15 +5,18 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Writer;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.csv.CSVFormat;
@@ -29,6 +32,9 @@ import com.espertech.esper.client.EPServiceProvider;
 import com.espertech.esper.client.EPServiceProviderManager;
 import com.espertech.esper.client.EPStatement;
 import com.espertech.esper.client.EventBean;
+import com.google.common.util.concurrent.AbstractExecutionThreadService;
+import com.google.common.util.concurrent.Service;
+import com.google.common.util.concurrent.ServiceManager;
 
 import de.uniluebeck.itm.util.logging.Logging;
 
@@ -45,46 +51,64 @@ public class InvestifyMain {
 		Logging.setLoggingDefaults();
 	}
 
-	public static void streamToEsper(EPRuntime esper, String file, String key) {
-		InputStream instream = InvestifyMain.class.getClassLoader().getResourceAsStream(file);
-		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+	public static class StreamToEsper extends AbstractExecutionThreadService {
+		private EPRuntime esper;
+		private String file;
+		String key;
 
-		Iterable<CSVRecord> records;
-		try {
-			records = CSVFormat.DEFAULT.withHeader("Date", "Open", "High", "Low", "Close", "Volume", "Adj Close")
-					.withSkipHeaderRecord().parse(new InputStreamReader(instream));
-
-			for (CSVRecord record : records) {
-				Map<String, Object> event = new HashMap<>();
-				event.put("key", key);
-				event.put("closing", Double.parseDouble(record.get("Close")));
-				event.put("date", format.parse(record.get("Date")));
-
-				esper.sendEvent(event, "StockEvent");
-			}
-
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+		public StreamToEsper(EPRuntime esper, String file, String key) {
+			super();
+			this.esper = esper;
+			this.file = file;
+			this.key = key;
 		}
+
+		@Override
+		protected void run() throws Exception {
+			InputStream instream = InvestifyMain.class.getClassLoader().getResourceAsStream(file);
+			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+
+			Iterable<CSVRecord> records;
+			try {
+				records = CSVFormat.DEFAULT.withHeader("Date", "Open", "High", "Low", "Close", "Volume", "Adj Close")
+						.withSkipHeaderRecord().parse(new InputStreamReader(instream));
+
+				for (CSVRecord record : records) {
+					Map<String, Object> event = new HashMap<>();
+					event.put("stockSymbol", key);
+					event.put("closing", Double.parseDouble(record.get("Close")));
+					event.put("date", format.parse(record.get("Date")));
+
+					esper.sendEvent(event, "StockEvent");
+				}
+
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
+
 	}
 
 	public static void setupQuery(EPAdministrator esper, Logger log, String stockSymbol, FileWriter writer) {
-		String expression = "select date, closing, AVG(closing) as avg " + "from StockEvent.win:time(10 seconds)";
+		String expression = "SELECT date, closing, AVG(closing) AS avgFiftyDays " + "FROM StockEvent(stockSymbol='"
+				+ stockSymbol + "').win:length_batch(252)";
 
 		EPStatement epStatement = esper.createEPL(expression);
 
 		// Creating a .csv file depending on the stock in which the output of
 		// each esper stream gets saved
 		// Format of .csv file: stockSymbol(will become important at a later
-		// point in time), date, closing, avg
+		// point in time), date, closing, avg50days, avg200days
 		try {
-			writer.append(stockSymbol);
+			writer.append("stockSymbol");
 			writer.append(',');
 			writer.append("date");
 			writer.append(',');
 			writer.append("closing");
 			writer.append(',');
-			writer.append("avg");
+			writer.append("avgFiftyDays");
+			writer.append(',');
+			writer.append("avg200days");
 			writer.append('\n');
 
 			epStatement.addListener((EventBean[] newEvents, EventBean[] oldEvents) -> {
@@ -104,18 +128,22 @@ public class InvestifyMain {
 					writer.append(',');
 					writer.append(String.valueOf(event.get("closing")));
 					writer.append(',');
-					writer.append(String.valueOf(event.get("avg")));
+					writer.append(String.valueOf(event.get("avgFiftyDays")));
+					writer.append(',');
+					writer.append(String.valueOf(event.get("avgFiftyDays")));
 					writer.append('\n');
+
+					writer.flush();
+
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
 				// This is just for debugging purposes - delete later
-				log.info("" + event.get("date"));
-				log.info("" + event.get("avg"));
+				log.info("{}: date = {}, avg = {}",
+						new Object[] { stockSymbol, event.get("date"), event.get("avgFiftyDays") });
 			});
-			writer.flush();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -131,7 +159,7 @@ public class InvestifyMain {
 		EPServiceProvider epServiceProvider = EPServiceProviderManager.getDefaultProvider(esperClientConfiguration);
 		{
 			Map<String, Object> eventDef = new HashMap<>();
-			eventDef.put("key", String.class);
+			eventDef.put("stockSymbol", String.class);
 			eventDef.put("closing", Double.class);
 			eventDef.put("date", java.util.Date.class);
 			epServiceProvider.getEPAdministrator().getConfiguration().addEventType("StockEvent", eventDef);
@@ -154,16 +182,19 @@ public class InvestifyMain {
 				currentYear, pastMonth, pastDay, pastYear);
 
 		// Stock symbols array - these Stocks will be analyzed
-		String[] stockSymbols = { "GOOG", "AAPL", "AMZN", "FB", "MSFT", "TWTR" };
+		String[] stockSymbols = { "AAPL", "AMZN", "FB", "GOOG", "MSFT", "TWTR" };
+		List<Service> services = new ArrayList<>();
+		List<Writer> writers = new ArrayList<>();
 
 		// Here the csv files are downloaded into the resource folder naming
-		// convetion: stockSymbol.csv
-		for (int i = 0; i < stockSymbols.length; i++) {
-			String currentStockSymbol = stockSymbols[i];
+		// convention: stockSymbol.csv
+		for (String currentStockSymbol : stockSymbols) {
 			URL baseURL = new URL(String.format("http://real-chart.finance.yahoo.com/table.csv?s=%s%s",
 					currentStockSymbol, dateString));
 
-			FileWriter writer = new FileWriter(String.format("./src/main/resources/%sIncludingAvg.csv", currentStockSymbol));
+			FileWriter writer = new FileWriter(
+					String.format("./src/main/resources/%sIncludingAvg.csv", currentStockSymbol));
+			writers.add(writer);
 			setupQuery(epServiceProvider.getEPAdministrator(), log, currentStockSymbol, writer);
 
 			// Writing the .csv file
@@ -171,10 +202,24 @@ public class InvestifyMain {
 			Path path = Paths.get(String.format("./src/main/resources/%s.csv", currentStockSymbol));
 			Files.copy(in, path, StandardCopyOption.REPLACE_EXISTING);
 			in.close();
-			
-			
-			new Thread(() -> streamToEsper(esper, String.format("%s.csv", currentStockSymbol), currentStockSymbol))
-					.start();
+
+			StreamToEsper streamToEsper = new StreamToEsper(esper, String.format("%s.csv", currentStockSymbol),
+					currentStockSymbol);
+			services.add(streamToEsper);
+		}
+
+		ServiceManager manager = new ServiceManager(services);
+		log.info("Starting services");
+
+		manager.startAsync().awaitHealthy();
+
+		log.info("Started {} services", services.size());
+		manager.awaitStopped();
+		log.info("All {} services stopped", services.size());
+
+		for (Writer w : writers) {
+			w.flush();
+			w.close();
 		}
 
 	}
