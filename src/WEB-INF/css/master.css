@@ -32,3 +32,8 @@ Stylesheet für Customizing
 .jumbotron {
  padding: 15px;
 }
+
+.table {
+  padding: 15px;
+  text-align: center;
+}
