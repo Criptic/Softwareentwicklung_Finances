@@ -19,12 +19,12 @@
           <div class="navbar-header">
             <a class="navbar-brand" href="#">
               <p>
-                Investify- Make the right desicions, at the right time
+                Investify - Make the right desicions, at the right time
               </p>
             </a>
           </div>
         </div>
-    </nav>
+      </nav>
     </header>
 
     <!--Main Content für Webseite -->
@@ -36,20 +36,20 @@
     </div>
 
     <!--Thumbnail Container -->
-    <div class="container">
+    <div class="container" id="main-content">
       <div class="row">
         <div class="col-md-4">
-          <a onclick="showApple()" class="thumbnail">
+          <a href="apple.html" class="thumbnail" id="apple-logo">
             <img class="img-responsive" src="pics/apple.png" alt="apple logo"/>
           </a>
         </div>
         <div class="col-md-4">
-          <a onclick="showApple()" class="thumbnail">
+          <a href="facebook.html" class="thumbnail" id="facebook-logo">
             <img class="img-responsive" src="pics/facebook.jpg" alt="facebook logo" />
           </a>
         </div>
         <div class="col-md-4">
-          <a onclick="showApple()" class="thumbnail">
+          <a href="twitter.html" class="thumbnail" id="twitter-logo">
             <img class="img-responsive" src="pics/twitter.png" alt="twitter logo" />
           </a>
         </div>
@@ -58,23 +58,64 @@
       </div>
       <div class="row">
         <div class="col-md-4">
-          <a onclick="showApple()" class="thumbnail">
+          <a href="google.html" class="thumbnail">
             <img class="img-responsive" src="pics/google.jpg" alt="google logo"/>
           </a>
         </div>
         <div class="col-md-4">
-          <a onclick="showApple()" class="thumbnail">
+          <a href="microsoft.html" class="thumbnail">
             <img class="img-responsive" src="pics/microsoft.png" alt="microsoft logo" />
           </a>
         </div>
         <div class="col-md-4">
-          <a onclick="showApple()" class="thumbnail">
+          <a href="amazon.html" class="thumbnail">
             <img class="img-responsive" src="pics/amazon.jpg" alt="amazon logo" />
           </a>
         </div>
       </div>
     </div>
 
+    <!--Line for a break -->
+    <div class="container top-buffer"> <hr /></div>
+
+    <!--Container for Table -->
+    <div class="container top-buffer">
+      <div class="center-block">
+        <table class="table table-bordered table-hover">
+          <tr>
+            <th>Rank</th>
+            <th>Name</th>
+            <th>Symbol</th>
+            <th>Status</th>
+            <th>...</th>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>APPL</td>
+            <td>Apple</td>
+            <td>Awesome!</td>
+            <td>...</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>APPL</td>
+            <td>Apple</td>
+            <td>Awesome!</td>
+            <td>...</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>APPL</td>
+            <td>Apple</td>
+            <td>Awesome!</td>
+            <td>...</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!--Div for space to footer -->
+    <div class="container top-buffer"></div>
 
     <footer class="footer">
       <div class="container">
@@ -88,7 +129,9 @@
     <script src="http://code.jquery.com/jquery-latest.min.js" </script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
     <!--Lates compiled and minified Version of D3 -->
-    <script src="//d3js.org/d3.v3.min.js"></script>
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+    <!--Papa Parse for parsing a csv -->
+    <script src="js/papaparse.min.js"></script>
     <!--Custom Javascripts -->
     <script language="javascript" type="text/javascript" src="js/master.js"></script>
   </body>
