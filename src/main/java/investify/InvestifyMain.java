@@ -51,6 +51,7 @@ public class InvestifyMain {
 		Logging.setLoggingDefaults();
 	}
 
+	// This Esper class is responsible for the average calculating stock event
 	public static class StreamToEsper extends AbstractExecutionThreadService {
 		private EPRuntime esper;
 		private String file;
@@ -89,6 +90,7 @@ public class InvestifyMain {
 
 	}
 
+	// This is the query setup of the average calculating stock event
 	public static void setupQuery(EPAdministrator esper, Logger log, String stockSymbol, FileWriter writer) {
 		String expression = "SELECT longAverage.date, longAverage.closing, AVG(longAverage.closing) AS avg250Days, AVG(shortAverage.closing) AS avg50Days "
 				+ "FROM StockEvent(stockSymbol='" + stockSymbol
@@ -150,6 +152,62 @@ public class InvestifyMain {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		epStatement.start();
+	}
+
+	// This Esper Class is responsible for the ending correlation event
+	public static class StreamToEsperCorrelation extends AbstractExecutionThreadService {
+		private EPRuntime esper;
+		private String file;
+		String key;
+
+		public StreamToEsperCorrelation(EPRuntime esper, String file, String key) {
+			super();
+			this.esper = esper;
+			this.file = file;
+			this.key = key;
+		}
+
+		@Override
+		protected void run() throws Exception {
+			InputStream instream = InvestifyMain.class.getClassLoader().getResourceAsStream(file);
+			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+
+			Iterable<CSVRecord> records;
+			try {
+				records = CSVFormat.DEFAULT.withHeader("Date", "Open", "High", "Low", "Close", "Volume", "Adj Close")
+						.withSkipHeaderRecord().parse(new InputStreamReader(instream));
+
+				for (CSVRecord record : records) {
+					Map<String, Object> event = new HashMap<>();
+					event.put("stockSymbol", key);
+					event.put("closing", Double.parseDouble(record.get("Close")));
+					event.put("date", format.parse(record.get("Date")));
+
+					esper.sendEvent(event, "StockEvent");
+				}
+
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+	}
+
+	// This is the query setup of the average calculating stock event
+	public static void setupQueryCorrelation(EPAdministrator esper, Logger log) {
+		String expression = "";
+
+		EPStatement epStatement = esper.createEPL(expression);
+
+		epStatement.addListener((EventBean[] newEvents, EventBean[] oldEvents) -> {
+			if (newEvents == null || newEvents.length < 1) {
+				log.warn("Received null event or length < 1: " + newEvents);
+				return;
+			}
+			EventBean event = newEvents[0];
+		});
+
 		epStatement.start();
 	}
 
@@ -224,6 +282,33 @@ public class InvestifyMain {
 			w.close();
 		}
 
+		/*
+		// Starting an event to correlate the selected stocks
+		EPServiceProvider epServiceProviderCorrelation = EPServiceProviderManager
+				.getDefaultProvider(esperClientConfiguration);
+		{
+			Map<String, Object> eventDef = new HashMap<>();
+			eventDef.put("stockSymbol", String.class);
+			eventDef.put("date", java.util.Date.class);
+			eventDef.put("closing", Double.class);
+			eventDef.put("avg50days", Double.class);
+			eventDef.put("avg250days", Double.class);
+			epServiceProvider.getEPAdministrator().getConfiguration().addEventType("CorrelationEvent", eventDef);
+		}
+
+		EPRuntime esperCorrelation = epServiceProviderCorrelation.getEPRuntime();
+		setupQueryCorrelation(epServiceProvider.getEPAdministrator(), log);
+
+		List<Service> correlation = new ArrayList<>();
+
+		StreamToEsperCorrelation streamToEsperCorrelation = new StreamToEsperCorrelation(esperCorrelation, "Result.csv",
+				"ending");
+		services.add(streamToEsperCorrelation);
+
+		ServiceManager correlationManager = new ServiceManager(correlation);
+		correlationManager.startAsync().awaitHealthy();
+		correlationManager.awaitStopped();
+		*/
 	}
 
 }
