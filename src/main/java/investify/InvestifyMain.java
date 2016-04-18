@@ -90,8 +90,10 @@ public class InvestifyMain {
 	}
 
 	public static void setupQuery(EPAdministrator esper, Logger log, String stockSymbol, FileWriter writer) {
-		String expression = "SELECT date, closing, AVG(closing) AS avgFiftyDays " + "FROM StockEvent(stockSymbol='"
-				+ stockSymbol + "').win:length_batch(252)";
+		String expression = "SELECT longAverage.date, longAverage.closing, AVG(longAverage.closing) AS avg250Days, AVG(shortAverage.closing) AS avg50Days "
+				+ "FROM StockEvent(stockSymbol='" + stockSymbol
+				+ "').win:length_batch(250) AS longAverage LEFT OUTER JOIN StockEvent(stockSymbol='" + stockSymbol
+				+ "').win:length_batch(50) AS shortAverage";
 
 		EPStatement epStatement = esper.createEPL(expression);
 
@@ -106,9 +108,9 @@ public class InvestifyMain {
 			writer.append(',');
 			writer.append("closing");
 			writer.append(',');
-			writer.append("avgFiftyDays");
+			writer.append("avg50Days");
 			writer.append(',');
-			writer.append("avg200days");
+			writer.append("avg250Days");
 			writer.append('\n');
 
 			epStatement.addListener((EventBean[] newEvents, EventBean[] oldEvents) -> {
@@ -124,13 +126,13 @@ public class InvestifyMain {
 				try {
 					writer.append(stockSymbol);
 					writer.append(',');
-					writer.append(String.valueOf(event.get("date")));
+					writer.append(String.valueOf(event.get("longAverage.date")));
 					writer.append(',');
-					writer.append(String.valueOf(event.get("closing")));
+					writer.append(String.valueOf(event.get("longAverage.closing")));
 					writer.append(',');
-					writer.append(String.valueOf(event.get("avgFiftyDays")));
+					writer.append(String.valueOf(event.get("avg50Days")));
 					writer.append(',');
-					writer.append(String.valueOf(event.get("avgFiftyDays")));
+					writer.append(String.valueOf(event.get("avg250Days")));
 					writer.append('\n');
 
 					writer.flush();
@@ -141,8 +143,8 @@ public class InvestifyMain {
 				}
 
 				// This is just for debugging purposes - delete later
-				log.info("{}: date = {}, avg = {}",
-						new Object[] { stockSymbol, event.get("date"), event.get("avgFiftyDays") });
+				log.info("{}: date = {}, avg250 = {}, avg50 = {}", new Object[] { stockSymbol,
+						event.get("longAverage.date"), event.get("avg250Days"), event.get("avg50Days") });
 			});
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
