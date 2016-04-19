@@ -14,11 +14,13 @@ $.ajax({
     dataType: "text",
     success: function(data) {
         console.log(data);
-        console.log($.type(data));
+        //console.log($.type(data));
         //Convert string to an array
         parseString(data);
         //Logic for colouring
         doColouring();
+        //Build the Table
+        buildTable();
     },
     error: function (request, status, error) {
 
@@ -76,9 +78,38 @@ function doColouring(){
         if (color > 0)changeColorGreen("#twitter-logo");
         break;
     }
-    console.log(symbol, color);
+    //console.log(symbol, color);
   }
 }
+
+////////////////////////////////////////////////
+
+//Add Values to Table
+function buildTable(){
+  //Get Table from DOM Element
+  var table = document.getElementById("table");
+
+  // Create an empty <tr> element and add it to the 1st position of the table
+  var row = table.insertRow(1); //Int at the end is index of Table --> 1 is first line
+  //Add logic with a for loop and a counter to automatic fill the table with data
+
+  // Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element
+  var cell1 = row.insertCell(0);
+  var cell2 = row.insertCell(1);
+  var cell3 = row.insertCell(2);
+  var cell4 = row.insertCell(3);
+
+  // Add some text to the new cells
+  cell1.innerHTML = "1";
+  cell2.innerHTML = results[0][0];
+  cell3.innerHTML = "Add logic here!";
+  cell4.innerHTML = results[0][1];
+}
+
+
+
+
+
 
 
 ////////////////////////////////////////////////
