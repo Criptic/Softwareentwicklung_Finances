@@ -1,4 +1,4 @@
-"name","color"
-"Apple",green
-"Facebook",yellow
-"Twitter",red
+name, color
+APPL, -50
+GOOG, 0
+AMAZ, 100
