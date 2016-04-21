@@ -31,7 +31,10 @@
     <div class="jumbotron">
       <h1>Investify</h1>
       <p>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+        <b>No Individual Investment Advice</b>
+      </p>
+      <p>
+        This website does not provide individual or customized legal, tax, or investment services. Since each individual's situation is unique, a qualified professional should be consulted before making financial decisions. The data displayed on this website is for educational and informational uses only. If you make financial decisions based on the information provided to you by this website the owners of this website can not be held accountable for any losses. Making decisions based solely on the information of one website is irresponsible and you should contact a professional before making any final financial decisions.
       </p>
     </div>
 
@@ -58,20 +61,30 @@
       </div>
       <div class="row">
         <div class="col-md-4">
-          <a href="google.html" class="thumbnail">
-            <img class="img-responsive" src="pics/google.jpg" alt="google logo"/>
+          <a href="google.html" class="thumbnail" id="google-logo">
+            <img class="img-responsive" src="pics/google.png" alt="google logo"/>
           </a>
         </div>
         <div class="col-md-4">
-          <a href="microsoft.html" class="thumbnail">
+          <a href="microsoft.html" class="thumbnail" id="microsoft-logo">
             <img class="img-responsive" src="pics/microsoft.png" alt="microsoft logo" />
           </a>
         </div>
         <div class="col-md-4">
-          <a href="amazon.html" class="thumbnail">
-            <img class="img-responsive" src="pics/amazon.jpg" alt="amazon logo" />
+          <a href="amazon.html" class="thumbnail" id="amazon-logo">
+            <img class="img-responsive" src="pics/amazon.png" alt="amazon logo" />
           </a>
         </div>
+      </div>
+    </div>
+
+    <!--Legend for Coloring -->
+     <div class="container top-buffer" id="legend">
+      <h4>Legend</h4>
+      <div >
+        <div class="red"></div> <p class="legend-text">Sell this stock!</p>
+        <div class="yellow"></div> <p class="legend-text">Hold this stock!</p>
+        <div class="green"></div> <p class="legend-text">Buy this stock!</p>
       </div>
     </div>
 
@@ -81,34 +94,12 @@
     <!--Container for Table -->
     <div class="container top-buffer">
       <div class="center-block">
-        <table class="table table-bordered table-hover">
+        <table class="table table-bordered table-hover" id="table">
           <tr>
             <th>Rank</th>
-            <th>Name</th>
             <th>Symbol</th>
-            <th>Status</th>
-            <th>...</th>
-          </tr>
-          <tr>
-            <td>1</td>
-            <td>APPL</td>
-            <td>Apple</td>
-            <td>Awesome!</td>
-            <td>...</td>
-          </tr>
-          <tr>
-            <td>2</td>
-            <td>APPL</td>
-            <td>Apple</td>
-            <td>Awesome!</td>
-            <td>...</td>
-          </tr>
-          <tr>
-            <td>3</td>
-            <td>APPL</td>
-            <td>Apple</td>
-            <td>Awesome!</td>
-            <td>...</td>
+            <th>Name</th>
+            <th>Score</th>
           </tr>
         </table>
       </div>

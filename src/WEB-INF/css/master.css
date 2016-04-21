@@ -18,6 +18,7 @@ Stylesheet für Customizing
   border-radius: 0px;
 }
 
+/* Footer Style */
 .footer{
   position: absolute;
   width: 100%;
@@ -36,4 +37,31 @@ Stylesheet für Customizing
 .table {
   padding: 15px;
   text-align: center;
+}
+
+/* Styling for legend */
+.legend-text{
+  padding: 5px;
+  text-indent: 15px;
+}
+
+.red{
+  float: left;
+  width: 24px;
+  height: 24px;
+  background-color: #F44336;
+}
+
+.yellow{
+  float:left;
+  width: 24px;
+  height: 24px;
+  background-color: #FFC107;
+}
+
+.green{
+  float: left;
+  width: 24px;
+  height: 24px;
+  background-color: #388E3C;
 }
