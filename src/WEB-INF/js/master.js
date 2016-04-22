@@ -49,34 +49,34 @@ function doColouring(){
     var color = results[i][5];
     switch(symbol) {
       case "AAPL":
-        if (color < 0)changeColorRed("#apple-logo");
-        if (color == 0)changeColorYellow("#apple-logo");
-        if (color > 0)changeColorGreen("#apple-logo");
+        if (color < 0)changeColor("#apple-logo", "#F44336");
+        if (color == 0)changeColor("#apple-logo", "#FFC107");
+        if (color > 0)changeColor("#apple-logo", "#388E3C");
         break;
       case "AMZN":
-        if (color < 0)changeColorRed("#amazon-logo");
-        if (color == 0)changeColorYellow("#amazon-logo");
-        if (color > 0)changeColorGreen("#amazon-logo");
+        if (color < 0)changeColor("#amazon-logo", "#F44336");
+        if (color == 0)changeColor("#amazon-logo", "#FFC107");
+        if (color > 0)changeColor("#amazon-logo", "#388E3C");
         break;
       case "FB":
-        if (color < 0)changeColorRed("#facebook-logo");
-        if (color == 0)changeColorYellow("#facebook-logo");
-        if (color > 0)changeColorGreen("#facebook-logo");
+        if (color < 0)changeColor("#facebook-logo", "#F44336");
+        if (color == 0)changeColor("#facebook-logo", "#FFC107");
+        if (color > 0)changeColor("#facebook-logo", "#388E3C");
         break;
       case "GOOG":
-        if (color < 0)changeColorRed("#google-logo");
-        if (color == 0)changeColorYellow("#google-logo");
-        if (color > 0)changeColorGreen("#google-logo");
+        if (color < 0)changeColor("#google-logo", "#F44336");
+        if (color == 0)changeColor("#google-logo", "#FFC107");
+        if (color > 0)changeColor("#google-logo", "#388E3C");
         break;
       case "MSFT":
-        if (color < 0)changeColorRed("#microsoft-logo");
-        if (color == 0)changeColorYellow("#microsoft-logo");
-        if (color > 0)changeColorGreen("#microsoft-logo");
+        if (color < 0)changeColor("#microsoft-logo", "#F44336");
+        if (color == 0)changeColor("#microsoft-logo", "#FFC107");
+        if (color > 0)changeColor("#microsoft-logo", "#388E3C");
         break;
       case "TWTR":
-        if (color < 0)changeColorRed("#twitter-logo");
-        if (color == 0)changeColorYellow("#twitter-logo");
-        if (color > 0)changeColorGreen("#twitter-logo");
+        if (color < 0)changeColor("#twitter-logo", "#F44336");
+        if (color == 0)changeColor("#twitter-logo", "#FFC107");
+        if (color > 0)changeColor("#twitter-logo", "#388E3C");
         break;
     }
     //console.log(symbol, color);
@@ -129,7 +129,7 @@ function buildTable(){
   var cell63 = row6.insertCell(2);
   var cell64 = row6.insertCell(3);
 
-  //Add Ranking Numbers
+  //Add ranking numbers
   cell11.innerHTML = "1";
   cell21.innerHTML = "2";
   cell31.innerHTML = "3";
@@ -137,7 +137,7 @@ function buildTable(){
   cell51.innerHTML = "5";
   cell61.innerHTML = "6";
 
-  //Add Symbols
+  //Add symbols
   cell12.innerHTML = results[0][0];
   cell22.innerHTML = results[1][0];
   cell32.innerHTML = results[2][0];
@@ -145,7 +145,15 @@ function buildTable(){
   cell52.innerHTML = results[4][0];
   cell62.innerHTML = results[5][0];
 
-  //Add Scores
+  //Add company name
+  cell13.innerHTML = getFullName(results[0][0]);
+  cell23.innerHTML = getFullName(results[1][0]);
+  cell33.innerHTML = getFullName(results[2][0]);
+  cell43.innerHTML = getFullName(results[3][0]);
+  cell53.innerHTML = getFullName(results[4][0]);
+  cell63.innerHTML = getFullName(results[5][0]);
+
+  //Add scores
   cell14.innerHTML = results[0][5].substring(0,6);
   cell24.innerHTML = results[1][5].substring(0,6);
   cell34.innerHTML = results[2][5].substring(0,6);
@@ -153,28 +161,27 @@ function buildTable(){
   cell54.innerHTML = results[4][5].substring(0,6);
   cell64.innerHTML = results[5][5].substring(0,6);
 
-  //Dummy
-  cell13.innerHTML = "Add logic here!";
 }
 
-
-
-
-
-
-
-////////////////////////////////////////////////
-
-//Dummy function to change Color of Thumbnail
-function changeColorRed(id){
-  d3.select(id).style("background-color", "#F44336");
+//Function to change color of thumbnails
+function changeColor(id, colorCode) {
+  d3.select(id).style("background-color", colorCode);
 }
 
-function changeColorYellow(id){
-  d3.select(id).style("background-color", "#FFC107");
-}
-
-
-function changeColorGreen(id){
-  d3.select(id).style("background-color", "#388E3C");
+//Function to translate the stock symbol into the full name of the company
+function getFullName(stockSymbol) {
+  switch (stockSymbol) {
+    case "AMZN":
+      return "Amazon";
+    case "AAPL":
+      return "Apple";
+    case "FB":
+      return "Facebook";
+    case "GOOG":
+      return "Google";
+    case "MSFT":
+      return "Microsoft";
+    case "TWTR":
+      return "Twitter";
+  }
 }
