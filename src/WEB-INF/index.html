@@ -81,10 +81,10 @@
     <!--Legend for Coloring -->
      <div class="container top-buffer" id="legend">
       <h4>Legend</h4>
-      <div >
-        <div class="red"></div> <p class="legend-text">Sell this stock!</p>
-        <div class="yellow"></div> <p class="legend-text">Hold this stock!</p>
-        <div class="green"></div> <p class="legend-text">Buy this stock!</p>
+      <div class="row">
+        <div class="col-md-4"><div class="green"></div> <p class="legend-text">Buy this stock!</p></div>
+        <div class="col-md-4"><div class="yellow"></div> <p class="legend-text">Hold this stock!</p></div>
+        <div class="col-md-4"><div class="red"></div> <p class="legend-text">Sell this stock!</p></div>
       </div>
     </div>
 
@@ -92,14 +92,15 @@
     <div class="container top-buffer"> <hr /></div>
 
     <!--Container for Table -->
+    <h2 class="text-center">Overview</h2>
     <div class="container top-buffer">
       <div class="center-block">
         <table class="table table-bordered table-hover" id="table">
           <tr>
-            <th>Rank</th>
-            <th>Symbol</th>
-            <th>Name</th>
-            <th>Score</th>
+            <th class="text-center">Rank</th>
+            <th class="text-center">Symbol</th>
+            <th class="text-center">Name</th>
+            <th class="text-center">Score</th>
           </tr>
         </table>
       </div>
