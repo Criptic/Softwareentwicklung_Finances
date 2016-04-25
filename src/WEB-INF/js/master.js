@@ -28,21 +28,16 @@ $.ajax({
     }
  });
 
-//Papaparse function for casting csv string into array.
-//Function is called in success case as callback function
-function parseString(string){
-  results = Papa.parse(string);
-  //show the data in console as array
-  console.log(results.data);
-  //Give value to the global variable
-  results = results.data;
-  //Delete first Element in Array because it is the header of csv
-  results.shift();
-}
+
+
+
 
 ////////////////////////////////////////////////
 
-//Tests for colouring logic
+//FUNCTIONS
+
+
+//Function for colouring logic
 function doColouring(){
   for(var i = 0; i < results.length; i++){
     var symbol = results[i][0];
@@ -83,7 +78,17 @@ function doColouring(){
   }
 }
 
-////////////////////////////////////////////////
+//Papaparse function for casting csv string into array.
+//Function is called in success case as callback function
+function parseString(string){
+  results = Papa.parse(string);
+  //show the data in console as array
+  console.log(results.data);
+  //Give value to the global variable
+  results = results.data;
+  //Delete first Element in Array because it is the header of csv
+  results.shift();
+}
 
 //Add Values to Table
 function buildTable(){
