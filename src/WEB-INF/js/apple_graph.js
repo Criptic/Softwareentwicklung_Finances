@@ -52,6 +52,7 @@ d3.csv("../main/resources/AAPL.csv", type, function(error, data) {
   svg.append("path")
       .datum(data)
       .attr("class", "line")
+      .attr("id", "mainline")
       .attr("d", line);
 });
 
