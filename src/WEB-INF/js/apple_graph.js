@@ -1,3 +1,6 @@
+var avg50days;
+var avg250days;
+
 var margin = {top: 20, right: 20, bottom: 30, left: 50},
     width = 960 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
@@ -43,17 +46,36 @@ d3.csv("../main/resources/AAPL.csv", type, function(error, data) {
       .attr("class", "y axis")
       .call(yAxis)
     .append("text")
-      .attr("transform", "rotate(-90)")
+      //.attr("transform", "rotate(-90)")
       .attr("y", 6)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
-      .text("Price ($)");
+      .text("Price $");
 
   svg.append("path")
       .datum(data)
       .attr("class", "line")
       .attr("id", "mainline")
       .attr("d", line);
+});
+
+d3.csv("../main/resources/AAPLIncludingAvg.csv", function(data){
+avg50days = data[0]["Avg50Days"];
+avg250days = data[0]["Avg250Days"];
+
+  svg.append("line")
+      .attr('x1', '0')
+      .attr('x2', width)
+      .attr('y1', y(avg50days))
+      .attr('y2', y(avg50days))
+      .attr('id', 'avg50days');
+
+  svg.append("line")
+      .attr('x1', '0')
+      .attr('x2', width)
+      .attr('y1', y(avg250days))
+      .attr('y2', y(avg250days))
+      .attr('id', 'avg250days');
 });
 
 function type(d) {
