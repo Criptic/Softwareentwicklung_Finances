@@ -5,12 +5,18 @@
   shape-rendering: crispEdges;
 }
 
-.x.axis path {
+/*.x.axis path {
   display: none;
-}
+}*/
 
-.line {
+#mainline {
   fill: none;
   stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+#avg50days {
+  fill: none;
+  stroke: black;
   stroke-width: 1.5px;
 }
