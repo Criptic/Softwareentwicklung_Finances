@@ -76,6 +76,10 @@ avg250days = data[0]["Avg250Days"];
       .attr('y1', y(avg250days))
       .attr('y2', y(avg250days))
       .attr('id', 'avg250days');
+
+  document.getElementById('text-avg50days').innerHTML+=(avg50days.substring(0,6));
+  document.getElementById('text-avg250days').innerHTML+=(avg250days.substring(0,6));
+
 });
 
 function type(d) {

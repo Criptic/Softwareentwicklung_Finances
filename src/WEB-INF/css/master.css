@@ -45,6 +45,16 @@ Stylesheet for customizing
   text-indent: 15px;
 }
 
+#text-avg50days{
+  text-indent: 35px;
+  font-style: italic;
+}
+#text-avg250days{
+  text-indent: 40px;
+  font-style: italic;
+}
+
+
 .red{
   float: left;
   width: 24px;
@@ -64,4 +74,11 @@ Stylesheet for customizing
   width: 24px;
   height: 24px;
   background-color: #388E3C;
+}
+
+.steelblue{
+  float: left;
+  width: 24px;
+  height: 24px;
+  background-color: steelblue;
 }

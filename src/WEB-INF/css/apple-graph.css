@@ -17,12 +17,12 @@
 
 #avg50days {
   fill: none;
-  stroke: black;
+  stroke: #FFC107;
   stroke-width: 1.5px;
 }
 
 #avg250days {
   fill: none;
-  stroke: black;
+  stroke: #F44336;
   stroke-width: 1.5px;
 }
