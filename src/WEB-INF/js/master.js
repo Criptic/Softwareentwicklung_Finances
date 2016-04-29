@@ -24,7 +24,7 @@ $.ajax({
     },
     error: function (request, status, error) {
 
-        alert(error);
+        alert("An error has occured. Are you using chrome? Please use the safari browser for a better visulization of the webpage");
     }
  });
 
