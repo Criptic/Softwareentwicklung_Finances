@@ -1,5 +1,39 @@
+var path;
+var avgpath;
 var avg50days;
 var avg250days;
+
+var page = window.location.pathname;
+page = page.split("/").pop();
+
+switch (page) {
+  case "apple.html":
+    path = "../main/resources/AAPL.csv";
+    avgpath = "../main/resources/AAPLIncludingAvg.csv";
+    break;
+  case "amazon.html":
+    path = "../main/resources/AMZN.csv";
+    avgpath = "../main/resources/AMZNIncludingAvg.csv";
+    break;
+  case "facebook.html":
+    path = "../main/resources/FB.csv";
+    avgpath = "../main/resources/FBIncludingAvg.csv";
+    break;
+  case "google.html":
+    path = "../main/resources/GOOG.csv";
+    avgpath = "../main/resources/GOOGIncludingAvg.csv";
+    break;
+  case "microsoft.html":
+    path = "../main/resources/MSFT.csv";
+    avgpath = "../main/resources/MSFTIncludingAvg.csv";
+    break;
+  case "twitter.html":
+    path = "../main/resources/TWTR.csv";
+    avgpath = "../main/resources/TWTRIncludingAvg.csv";
+    break;
+  default:
+
+}
 
 var margin = {top: 20, right: 20, bottom: 30, left: 50},
     width = 960 - margin.left - margin.right,
@@ -25,13 +59,13 @@ var line = d3.svg.line()
     .x(function(d) { return x(d.Date); })
     .y(function(d) { return y(d.Close); });
 
-var svg = d3.select("#apple-graph").append("svg")
+var svg = d3.select("#graph").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-d3.csv("../main/resources/AAPL.csv", type, function(error, data) {
+d3.csv(path, type, function(error, data) {
   if (error) throw error;
 
   x.domain(d3.extent(data, function(d) { return d.Date; }));
@@ -59,7 +93,7 @@ d3.csv("../main/resources/AAPL.csv", type, function(error, data) {
       .attr("d", line);
 });
 
-d3.csv("../main/resources/AAPLIncludingAvg.csv", function(data){
+d3.csv(avgpath, function(data){
 avg50days = data[0]["Avg50Days"];
 avg250days = data[0]["Avg250Days"];
 
