@@ -1,3 +1,7 @@
+/*
+CSS File for styling the graphs and their colors
+*/
+
 .axis path,
 .axis line {
   fill: none;
