@@ -1,0 +1,32 @@
+/*
+CSS File for styling the graphs and their colors
+*/
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+/*.x.axis path {
+  display: none;
+}*/
+
+#mainline {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+#avg50days {
+  fill: none;
+  stroke: #FFC107;
+  stroke-width: 1.5px;
+}
+
+#avg250days {
+  fill: none;
+  stroke: #F44336;
+  stroke-width: 1.5px;
+}

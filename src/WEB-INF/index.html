@@ -1,0 +1,130 @@
+<!DOCTYPE>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Investify</title>
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.6/flatly/bootstrap.min.css">
+    <!--Font awesome -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <!--Custom Style Sheet -->
+    <link rel="stylesheet" href="css/master.css" title="no title" charset="utf-8">
+  </head>
+
+  <body>
+    <header>
+      <nav class="navbar navbar-default" style="border-radius:0px;">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <a class="navbar-brand" href="#">
+              <p>
+                Investify - Make the right desicions, at the right time
+              </p>
+            </a>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <!--Main Content für Webseite -->
+    <div class="jumbotron">
+      <h1>Investify</h1>
+      <p>
+        <b>No Individual Investment Advice</b>
+      </p>
+      <p>
+        This website does not provide individual or customized legal, tax, or investment services. Since each individual's situation is unique, a qualified professional should be consulted before making financial decisions. The data displayed on this website is for educational and informational uses only. If you make financial decisions based on the information provided to you by this website the owners of this website can not be held accountable for any losses. Making decisions based solely on the information of one website is irresponsible and you should contact a professional before making any final financial decisions.
+      </p>
+    </div>
+
+    <!--Thumbnail Container -->
+    <div class="container" id="main-content">
+      <div class="row">
+        <div class="col-md-4">
+          <a href="apple.html" class="thumbnail" id="apple-logo">
+            <img class="img-responsive" src="pics/apple.png" alt="apple logo"/>
+          </a>
+        </div>
+        <div class="col-md-4">
+          <a href="facebook.html" class="thumbnail" id="facebook-logo">
+            <img class="img-responsive" src="pics/facebook.png" alt="facebook logo" />
+          </a>
+        </div>
+        <div class="col-md-4">
+          <a href="twitter.html" class="thumbnail" id="twitter-logo">
+            <img class="img-responsive" src="pics/twitter.png" alt="twitter logo" />
+          </a>
+        </div>
+      </div>
+      <div class="row top-buffer">
+      </div>
+      <div class="row">
+        <div class="col-md-4">
+          <a href="google.html" class="thumbnail" id="google-logo">
+            <img class="img-responsive" src="pics/google.png" alt="google logo"/>
+          </a>
+        </div>
+        <div class="col-md-4">
+          <a href="microsoft.html" class="thumbnail" id="microsoft-logo">
+            <img class="img-responsive" src="pics/microsoft.png" alt="microsoft logo" />
+          </a>
+        </div>
+        <div class="col-md-4">
+          <a href="amazon.html" class="thumbnail" id="amazon-logo">
+            <img class="img-responsive" src="pics/amazon.png" alt="amazon logo" />
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!--Legend for Coloring -->
+     <div class="container top-buffer" id="legend">
+      <h4>Legend</h4>
+      <div class="row">
+        <div class="col-md-4"><div class="green"></div> <p class="legend-text">Buy this stock!</p></div>
+        <div class="col-md-4"><div class="yellow"></div> <p class="legend-text">Hold this stock!</p></div>
+        <div class="col-md-4"><div class="red"></div> <p class="legend-text">Sell this stock!</p></div>
+      </div>
+    </div>
+
+    <!--Line for a break -->
+    <div class="container top-buffer"> <hr /></div>
+
+    <!--Container for Table -->
+    <h2 class="text-center">Overview</h2>
+    <div class="container top-buffer">
+      <div class="center-block">
+        <table class="table table-bordered table-hover" id="table">
+          <tr>
+            <th class="text-center">Rank</th>
+            <th class="text-center">Symbol</th>
+            <th class="text-center">Name</th>
+            <th class="text-center">Score</th>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!--Div for space to footer -->
+    <div class="container top-buffer"></div>
+
+    <footer class="footer">
+      <div class="container">
+        <p class="text">
+        <i class="fa fa-github-square fa-2x"></i>
+        <a href="https://github.com/Criptic/Softwareentwicklung_Finances">GitHub</a></p>
+      </div>
+    </footer>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="http://code.jquery.com/jquery-latest.min.js" </script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    <!--Lates compiled and minified Version of D3 -->
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+    <!--Papa Parse for parsing a csv -->
+    <script src="js/papaparse.min.js"></script>
+    <!--Custom Javascripts -->
+    <script language="javascript" type="text/javascript" src="js/master.js"></script>
+  </body>
+</html
