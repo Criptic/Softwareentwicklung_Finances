@@ -9,3 +9,6 @@ The website is fully mobile friendly, through the utilization of bootstrap.
 
 The product is presented in this video below which is available on YouTube:
 https://youtu.be/ZfeSI3UX4rw
+
+A more detailied documentation and presentation, also including the above mentioned video, can be found under the following link:
+https://github.com/Criptic/Softwareentwicklung_Finances/blob/master/documentation/HTML%20presentation/Presentation_DHBWSoftwareentwicklung.html
