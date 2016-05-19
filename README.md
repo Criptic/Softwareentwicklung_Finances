@@ -12,3 +12,4 @@ https://youtu.be/ZfeSI3UX4rw
 
 A more detailied documentation and presentation, also including the above mentioned video, can be found under the following link:
 https://github.com/Criptic/Softwareentwicklung_Finances/blob/master/documentation/HTML%20presentation/Presentation_DHBWSoftwareentwicklung.html
+Or view it directly over at: https://htmlpreview.github.io/?https://github.com/Criptic/Softwareentwicklung_Finances/blob/master/documentation/HTML%20presentation/Presentation_DHBWSoftwareentwicklung.html
